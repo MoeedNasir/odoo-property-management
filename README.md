@@ -12,8 +12,22 @@ Built as part of my Odoo Developer Roadmap project.
 - Website integration
 
 ## Installation
-1. Clone repo into your Odoo `addons` directory
-2. Update app list
-3. Install "Property Management" from Apps
+1. Clone repo into your Odoo `addons` directory 2. Update app list 3. Install "Property Management" from Apps
+
+
+## WEEK 1
+- Base module setup (`__manifest__.py`, `__init__.py`). - Installable from Odoo Apps menu. - Clean uninstall/install cycle. - Structured for upcoming weeks (models, 
+views, security).
+
+
+## Module Structure:
+cpm_property/
+│── init.py
+│── manifest.py
+│── models/
+│── views/
+│── security/
+│── README.md
+
 
 
