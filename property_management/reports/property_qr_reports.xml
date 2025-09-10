@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Enhanced Property Report with QR Code -->
+    <record id="action_report_property_qr" model="ir.actions.report">
+        <field name="name">Property Report with QR</field>
+        <field name="model">property.property</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">property_management.property_qr_report_template</field>
+        <field name="report_file">property_management.property_qr_report_template</field>
+        <field name="print_report_name">'Property Report - %s' % (object.name)</field>
+        <field name="binding_model_id" ref="model_property_property"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="property_qr_report_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.internal_layout">
+                    <div class="page">
+                        <h2>Property Report: <span t-field="doc.name"/></h2>
+                        <div style="float: right;">
+                            <img t-att-src="'/report/barcode/QR/%s' % doc.reference_code"
+                                 alt="QR Code" style="width: 100px; height: 100px;"/>
+                        </div>
+                        <hr/>
+                        <table class="table table-bordered">
+                            <tr>
+                                <th>Reference Code</th>
+                                <td><span t-field="doc.reference_code"/></td>
+                            </tr>
+                            <tr>
+                                <th>Address</th>
+                                <td><span t-field="doc.address"/></td>
+                            </tr>
+                            <tr>
+                                <th>Postcode</th>
+                                <td><span t-field="doc.postcode"/></td>
+                            </tr>
+                            <tr>
+                                <th>Type</th>
+                                <td><span t-field="doc.property_kind"/></td>
+                            </tr>
+                            <tr>
+                                <th>Size (sq ft)</th>
+                                <td><span t-field="doc.size"/></td>
+                            </tr>
+                            <tr>
+                                <th>Monthly Rate</th>
+                                <td><span t-field="doc.monthly_rate"/></td>
+                            </tr>
+                            <tr>
+                                <th>Expected Price</th>
+                                <td><span t-field="doc.expected_price"/></td>
+                            </tr>
+                            <tr>
+                                <th>Selling Price</th>
+                                <td><span t-field="doc.selling_price"/></td>
+                            </tr>
+                            <tr>
+                                <th>Status</th>
+                                <td><span t-field="doc.state"/></td>
+                            </tr>
+                        </table>
+
+                        <h3>Tenants:</h3>
+                        <t t-if="doc.tenant_ids">
+                            <ul>
+                                <t t-foreach="doc.tenant_ids" t-as="tenant">
+                                    <li><span t-field="tenant.name"/> - <span t-field="tenant.email"/> - <span t-field="tenant.phone"/></li>
+                                </t>
+                            </ul>
+                        </t>
+                        <t t-else="">
+                            <p>No tenants assigned</p>
+                        </t>
+
+                        <h3>Description:</h3>
+                        <p t-field="doc.description"/>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <!-- Tenant Contract Report -->
+    <record id="action_report_tenant_contract" model="ir.actions.report">
+        <field name="name">Tenant Contract</field>
+        <field name="model">property.tenant</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">property_management.tenant_contract_template</field>
+        <field name="report_file">property_management.tenant_contract_template</field>
+        <field name="print_report_name">'Tenant Contract - %s' % (object.name)</field>
+        <field name="binding_model_id" ref="model_property_tenant"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="tenant_contract_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.internal_layout">
+                    <div class="page">
+                        <h2 style="text-align: center;">TENANT AGREEMENT</h2>
+                        <hr/>
+
+                        <p>This agreement is made on <span t-field="doc.create_date"/> between:</p>
+
+                        <p><strong>LANDLORD/PROPERTY MANAGER:</strong> [Your Company Name]</p>
+                        <p><strong>TENANT:</strong> <span t-field="doc.name"/></p>
+
+                        <h3>Property Details:</h3>
+                        <t t-if="doc.property_id">
+                            <p>Address: <span t-field="doc.property_id.address"/></p>
+                            <p>Property: <span t-field="doc.property_id.name"/></p>
+                            <p>Monthly Rent: $<span t-field="doc.property_id.monthly_rate"/></p>
+                        </t>
+                        <t t-else="">
+                            <p>No property assigned</p>
+                        </t>
+
+                        <h3>Terms and Conditions:</h3>
+                        <ol>
+                            <li>The tenant agrees to pay rent on the first day of each month.</li>
+                            <li>A security deposit of one month's rent is required.</li>
+                            <li>The tenant is responsible for basic utilities unless otherwise specified.</li>
+                            <li>No pets allowed without written permission from the landlord.</li>
+                            <li>This agreement is valid for 12 months from the start date.</li>
+                        </ol>
+
+                        <br/><br/>
+
+                        <table width="100%">
+                            <tr>
+                                <td width="50%">
+                                    <p>_________________________</p>
+                                    <p>Landlord/Property Manager</p>
+                                    <p>Date: ___________________</p>
+                                </td>
+                                <td width="50%">
+                                    <p>_________________________</p>
+                                    <p>Tenant: <span t-field="doc.name"/></p>
+                                    <p>Date: ___________________</p>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

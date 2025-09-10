@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Graph View: Average Monthly Rate by Property Kind -->
+    <record id="view_property_graph" model="ir.ui.view">
+        <field name="name">property.property.graph</field>
+        <field name="model">property.property</field>
+        <field name="type">graph</field> <!-- This defines it as a graph view -->
+        <field name="arch" type="xml">
+            <graph type="bar"> <!-- You can use 'bar', 'pie', 'line' -->
+                <!-- The 'type' of chart -->
+                <field name="property_kind" type="row"/> <!-- X-Axis: Group by -->
+                <field name="monthly_rate" type="measure"/> <!-- Y-Axis: Value to aggregate -->
+                <!-- This will show the average monthly rate for each property kind -->
+            </graph>
+        </field>
+    </record>
+    <!-- Action for the Graph/Dashboard View -->
+    <record id="action_property_dashboard" model="ir.actions.act_window">
+        <field name="name">Property Dashboard</field>
+        <field name="res_model">property.property</field>
+        <field name="view_mode">graph,pivot</field> <!-- Allow switching to pivot view -->
+        <field name="view_id" ref="view_property_graph"/> <!-- Default to the graph view -->
+        <field name="context">{"search_default_available": 1}</field> <!-- Optional: apply a filter by default -->
+    </record>
+    <!-- Tenant Action -->
+    <record id="action_property_tenant" model="ir.actions.act_window">
+        <field name="name">Tenants</field>
+        <field name="res_model">property.tenant</field>
+        <field name="view_mode">list,form</field>
+    </record>
+    <!--Action to open view-->
+    <record id="action_property_property" model="ir.actions.act_window">
+        <field name="name">Properties</field>
+        <field name="res_model">property.property</field>
+        <field name="view_mode">list,form,kanban</field>
+    </record>
+    <!-- Property Tree List View-->
+    <record id="view_property_tree" model="ir.ui.view">
+        <field name="name">property.property.tree</field>
+        <field name="model">property.property</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="property_kind"/>
+                <field name="monthly_rate"/>
+                <field name="is_available"/>
+            </list>
+        </field>
+    </record>
+    <!-- Property Form View-->
+    <record id="view_property_form" model="ir.ui.view">
+        <field name="name">property.property.form</field>
+        <field name="model">property.property</field>
+        <field name="arch" type="xml">
+            <form>
+                 <header>
+                     <field name="state" widget="statusbar" statusbar_colors='{"draft": "grey", "available": "blue", "sold": "green", "cancelled": "red"}'/>
+                     <!-- STATE FLOW BUTTONS -->
+                     <button name="action_mark_available"
+                             type="object"
+                             string="Mark Available"
+                             class="btn-primary"
+                             invisible="state != 'draft'"
+                             title="Make this property available for rent/sale"
+                     />
+                     <button name="action_mark_sold"
+                             type="object"
+                             string="Mark as Sold"
+                             class="btn-primary"
+                             invisible="not (state == 'draft' or state == 'available')"
+                             title="Mark this property as sold"
+                     />
+                     <button name="action_mark_cancelled"
+                             type="object"
+                             string="Cancel Listing"
+                             class="btn-secondary"
+                             invisible="not (state == 'draft' or state == 'available')"
+                             title="Cancel this property listing"
+                     />
+                     <button name="action_reopen"
+                             type="object"
+                             string="Reopen"
+                             class="btn-secondary"
+                             invisible="not (state == 'sold' or state == 'cancelled')" title="Reopen this property for editing"
+                     />
+                 </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="%(action_property_tenant)d" type="action" icon="fa-users" context="{'default_property_id': id}">
+                            <field name="tenant_ids" widget="statinfo" string="Tenants"/>
+                        </button>
+                        <button name="action_mark_sold" type="object"
+                                string="Mark as Sold" class="btn-primary"
+                                invisible="state == 'sold'"
+                        />
+                    </div>
+                    <group colspan="2">
+                    <!-- Left column: Property Info -->
+                        <group name="property_info" string="Property Information">
+                            <field name="reference_code" readonly="1"/>
+                            <field name="name"/>
+                            <field name="is_available"/>
+                            <field name="date_availability"/>
+                            <field name="property_kind" string="Category"/>
+                            <field name="property_type_id" string="Specific Type" context="{'default_property_kind': property_kind}"/>
+                            <field name="description" placeholder="Describe the property..."/>
+                            <field name="size" placeholder="0" help="Total area in square feet"/>
+                            <field name="address"/>
+                            <field name="postcode"/>
+                        </group>
+                    <!-- Right column: Pricing + Garden stacked vertically -->
+                        <group>
+                            <group name="price_info" string="Pricing">
+                                <field name="monthly_rate" placeholder="0.00" help="Enter the monthly rental price in your local currency"/>
+                                <field name="expected_price"/>
+                                <field name="selling_price"/>
+                            </group>
+                            <group name="garden_info" string="Garden Information">
+                                <field name="garage"/>
+                                <field name="garden"/>
+                                <field name="garden_area" invisible="garden == False"/>
+                                <field name="garden_orientation" invisible="garden == False"/>
+                            </group>
+                        </group>
+                    </group>
+                    <!-- Notebook Tabs for Financial Information and Payment History -->
+                    <notebook>
+                        <page string="Financial Information">
+                            <group>
+                                <field name="expected_price"/>
+                                <field name="selling_price"/>
+                                <field name="monthly_rate"/>
+                            </group>
+                        </page>
+                        <page string="Payment History">
+                            <group>
+                                <field name="payment_ids" widget="one2many_list"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <!-- Chatter Box-->
+                <div class="oe_chatter">
+                    <!--<field name="message_follower_ids" widget="mail_followers"/>-->
+                    <!--<field name="activity_ids" widget="mail_activity"/>-->
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Property Kanban View-->
+    <record id="view_property_kanban" model="ir.ui.view">
+        <field name="name">property.property.kanban</field>
+        <field name="model">property.property</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state">
+                <field name="state"/>
+                <field name="name"/>
+                <field name="property_kind"/>
+                <field name="monthly_rate"/>
+                <field name="is_available"/>
+                <field name="selling_price"/>
+                <field name="expected_price"/>
+                <templates>
+                    <t t-name="kanban-box">
+                       <div class="oe_kanban_global_click">
+                          <!--Class Header-->
+                           <div class="o_kanban_record_top">
+                               <div class="o_kanban_record_title">
+                                   <field name="name"/>
+                               </div>
+                               <div class="o_kanban_record_title">
+                                   <field name="property_kind"/>
+                               </div>
+                           </div>
+                           <!--Card Body-->
+                           <div class="o_kanban_record_body">
+                               <div>
+                                   <span>Price: $</span>
+                                   <field name="monthly_rate"/>
+                                   <span>/month</span>
+                               </div>
+                               <div>
+                                   <span>Status</span>
+                                   <field name="state"/>
+                               </div>
+                               <div t-if="record.selling_price.raw_value">
+                                  <span>Sold for: $</span>
+                                   <field name="selling_price"/>
+                               </div>
+                           </div>
+
+                           <!--Card Footer-->
+                           <div class="o_kanban_record_bottom">
+                               <div class="oe_kanban_bottom_left">
+                                   <field name="is_available" widget="boolean_button" options='{"terminology": "available"}'/>
+                               </div>
+                           </div>
+                       </div>
+                    </t>
+                </templates>
+                <!--Column Progress Bar-->
+                <progressbar
+                        field="state"
+                        colors= '{"draft": "warning", "available": "success", "sold": "info", "cancelled": "danger"}'
+                />
+            </kanban>
+        </field>
+    </record>
+    <!-- Property Search View-->
+    <record id="view_property_search" model="ir.ui.view">
+        <field name="name">property.property.search</field>
+        <field name="model">property.property</field>
+        <field name="arch" type="xml">
+            <search>
+            <!-- Search Panel -->
+                <field name="name" string="Property Name"/>
+                <field name="property_kind"/>
+                <field name="is_available"/>
+            <!-- Pre-configured Filters -->
+                <filter string="Available Properties" name="available" domain="[('is_available', '=', True)]"/>
+                <filter string="Houses" name="houses" domain="[('property_kind', '=', 'house')]"/>
+                <filter string="My Properties" name="my_properties"
+                        domain="[('create_uid', '=', uid)]"
+                        groups="property_management.group_sales_agent"/>
+                <filter string="My Property" name="my_property"
+                        domain="[('tenant_ids.user_id', '=', uid)]"
+                        groups="property_management.group_tenant_user"/>
+            <!-- Group By Options -->
+                <group expand="0" string="Group By">
+                    <filter string="Kind" name="group_by_kind" context="{'group_by': 'property_kind'}"/>
+                    <filter string="Availability" name="group_by_availability" context="{'group_by': 'is_available'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    <!-- Tree View for Tenants -->
+    <record id="view_tenant_tree" model="ir.ui.view">
+        <field name="name">property.tenant.tree</field>
+        <field name="model">property.tenant</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="property_id"/>
+                <field name="email"/>
+                <field name="phone"/>
+            </list>
+        </field>
+    </record>
+    <!--Tenants Form View-->
+    <record id="view_tenant_form" model="ir.ui.view">
+        <field name="name">property.tenant.form</field>
+        <field name="model">property.tenant</field>
+        <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="%(action_report_tenant_contract)d"
+                                    type="action"
+                                    string="Print Contract"
+                                    class="btn-primary"
+                            />
+                        </div>
+                        <!--Tenant User Account Button-->
+                        <div class="oe_button_box" name="button_box">
+                            <button name="action_create_user_account"
+                                    type="object"
+                                    string="Create User Account"
+                                    class="btn-primary"
+                                    invisible="user_id != False"/>
+                            <field name="user_id"
+                                   widget="statinfo"
+                                   string="User Account"
+                                   invisible="user_id == False"/>
+                        </div>
+                        <group>
+                             <field name="name"/>
+                            <field name="property_id"/>
+                            <field name="email"/>
+                            <field name="phone"/>
+                        </group>
+                    </sheet>
+                </form>
+        </field>
+    </record>
+</odoo>

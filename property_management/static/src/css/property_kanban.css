@@ -1,0 +1,42 @@
+/* Custom styling for property kanban cards */
+.o_kanban_view .o_kanban_record {
+    border-left: 4px solid #ddd;
+    min-height: 120px;
+}
+
+/* Color coding based on state */
+.o_kanban_group [data-state="draft"] .o_kanban_record {
+    border-left-color: #ffc107; /* Yellow for draft */
+}
+
+.o_kanban_group [data-state="available"] .o_kanban_record {
+    border-left-color: #28a745; /* Green for available */
+}
+
+.o_kanban_group [data-state="sold"] .o_kanban_record {
+    border-left-color: #17a2b8; /* Blue for sold */
+}
+
+.o_kanban_group [data-state="cancelled"] .o_kanban_record {
+    border-left-color: #dc3545; /* Red for cancelled */
+}
+
+/* Card styling */
+.o_kanban_record_title {
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.o_kanban_record_subtitle {
+    color: #6c757d;
+    font-size: 12px;
+}
+
+.o_kanban_record_body {
+    margin: 8px 0;
+}
+
+.o_kanban_record_body div {
+    margin: 4px 0;
+    font-size: 12px;
+}
