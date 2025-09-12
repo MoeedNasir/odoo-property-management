@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Main Menus -->
+    <menuitem id="menu_property_root" name="Property Management"
+              sequence="10" web_icon="property_management,static/description/icon.png"
+              action="action_property_property"
+    />
+    <menuitem id="menu_property_main"
+              name="Properties" parent="menu_property_root"
+              action="action_property_property"
+              sequence="10"
+    />
+    <menuitem id="menu_property_dashboard"
+              name="Dashboard" parent="menu_property_root"
+              action="action_property_dashboard"
+              sequence="5"
+    />
+    <menuitem id="menu_property_tenant"
+              name="Tenants"
+              parent="menu_property_main"
+              action="action_property_tenant"
+              sequence="20"
+    />
+    <menuitem id="menu_property_payment"
+              name="Payments"
+              parent="menu_property_main"
+              action="action_property_payment"
+              sequence="30"
+    />
+</odoo>

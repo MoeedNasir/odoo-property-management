@@ -1,0 +1,36 @@
+{
+    'name': 'Property Management',
+    'version': '1.0',
+    'summary': 'This is a Company Property & Rental Management System',
+    'description': """This module will manage commercial or residential properties, tenants, leases, maintenance requests, and payments""",
+    'category': 'Property Management',
+    'author': 'Moeed Nasir',
+    'website': 'https://moeed-portfolio.netlify.app/',
+    'license': 'LGPL-3',
+    'depends': ['base', 'website', 'base_setup', 'mail','web', 'web_editor'],
+    'data': [
+        'data/property_type.xml',
+        'data/email_templates.xml',
+        'data/payment_data.xml',
+        'security/property_security.xml',
+        'security/ir.model.access.csv',
+        'views/website_templates.xml',
+        'views/property_views.xml',
+        'views/property_attachments.xml',
+        'views/payment_views.xml',
+        'views/role_actions.xml',
+        'views/role_views.xml',
+        'views/role_menus.xml',
+        'views/menus.xml',
+        'reports/property_reports.xml',
+        'reports/property_qr_reports.xml',
+    ],
+    'assets':{
+        'web.assets_backend':[
+            'property_management/static/src/css/property_kanban.css',
+        ]
+    },
+    'installable': True,
+    'application': True,
+    'auto_install': False,
+}

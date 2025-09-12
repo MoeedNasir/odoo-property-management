@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Image Gallery View -->
+    <record id="view_property_images" model="ir.ui.view">
+        <field name="name">property.property.images</field>
+        <field name="model">property.property</field>
+        <field name="arch" type="xml">
+            <kanban class="o_images_kanban">
+                <field name="image_ids"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click">
+                            <div class="o_kanban_image">
+                                <t t-if="record.image_ids.raw_value and record.image_ids.raw_value[0]">
+                                    <img t-att-src="'/web/image/ir.attachment/' + record.image_ids.raw_value[0] + '/datas'"
+                                         class="img-fluid" alt="Property Image" style="max-height: 150px; object-fit: cover;"/>
+                                </t>
+                                <t t-else="">
+                                    <img src="/web/static/img/placeholder.png" class="img-fluid" alt="No Image" style="max-height: 150px;"/>
+                                </t>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Enhanced Property Form View with Attachments -->
+    <record id="view_property_form_inherit" model="ir.ui.view">
+        <field name="name">property.property.form.inherit</field>
+        <field name="model">property.property</field>
+        <field name="inherit_id" ref="property_management.view_property_form"/>
+        <field name="arch" type="xml">
+
+            <!-- Add Main Image to Header -->
+            <xpath expr="//header" position="before">
+                <div class="oe_title" style="position: relative;">
+                    <field name="image_1920" widget="image" class="oe_avatar"
+                           options="{'preview_image': 'image_1920', 'zoom': true}"
+                           style="position: absolute; right: 0; top: 0; width: 100px; height: 100px;"/>
+                </div>
+            </xpath>
+
+            <!-- Add Attachments Tab to Notebook -->
+            <xpath expr="//notebook" position="inside">
+                <page string="Images &amp; Attachments">
+                    <group>
+                        <!-- Image Gallery -->
+                        <group string="Property Images" col="4">
+                            <field name="image_ids" widget="many2many_images"
+                                   options="{'accepted_file_extensions': 'image/*'}"
+                                   context="{'default_res_model': 'property.property', 'default_res_id': id}">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="create_date" string="Uploaded"/>
+                                </list>
+                            </field>
+                        </group>
+
+                        <!-- Documents -->
+                        <group string="Documents &amp; Contracts" col="8">
+                            <field name="document_ids" widget="many2many_binary"
+                                   context="{'default_res_model': 'property.property', 'default_res_id': id}"
+                                   options="{'accepted_file_extensions': '.pdf,.doc,.docx,.xls,.xlsx,.txt'}">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="create_date" string="Uploaded"/>
+                                </list>
+                            </field>
+                        </group>
+                    </group>
+
+                    <!-- Quick Upload Buttons -->
+                    <group string="Quick Upload">
+                        <button name="%(action_property_attachments)d"
+                                type="action"
+                                string="Manage All Attachments"
+                                class="btn-primary"/>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Action for Attachment Management -->
+    <record id="action_property_attachments" model="ir.actions.act_window">
+        <field name="name">Property Attachments</field>
+        <field name="res_model">ir.attachment</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="domain">[('res_model', '=', 'property.property'), ('res_id', '=', active_id)]</field>
+        <field name="context">{
+            'default_res_model': 'property.property',
+            'default_res_id': active_id,
+            'search_default_images': 1
+        }</field>
+    </record>
+
+    <!-- Search View for Attachments -->
+    <record id="view_attachment_search_property" model="ir.ui.view">
+        <field name="name">ir.attachment.property.search</field>
+        <field name="model">ir.attachment</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="mimetype"/>
+                <filter string="Images" name="images" domain="[('mimetype', 'ilike', 'image/%')]"/>
+                <filter string="Documents" name="documents" domain="[('mimetype', 'not ilike', 'image/%')]"/>
+                <filter string="PDF Files" name="pdf" domain="[('mimetype', '=', 'application/pdf')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="File Type" name="group_by_type" context="{'group_by': 'mimetype'}"/>
+                    <filter string="Upload Date" name="group_by_date" context="{'group_by': 'create_date:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+</odoo>

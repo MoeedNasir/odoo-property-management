@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+     <!-- Report Action: This creates the "Print" button in the UI -->
+    <record id="action_report_property" model="ir.actions.report">
+        <field name="name">Property Report</field>
+        <field name="model">property.property</field> <!-- Model this report is for -->
+        <field name="report_type">qweb-pdf</field> <!-- Output format -->
+        <field name="report_name">property_management.property_report_template</field> <!-- Technical name of the template -->
+        <field name="report_file">property_management.property_report_template</field> <!-- Template file identifier -->
+        <field name="print_report_name">'Property Report - %s' % (object.name)</field> <!-- Dynamic PDF filename -->
+        <field name="binding_model_id" ref="model_property_property"/> <!-- Binds the report to the model -->
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- QWeb Template: This defines the content of the PDF -->
+    <template id="property_report_template">
+        <t t-call="web.html_container"> <!-- This calls the standard Odoo PDF layout -->
+            <t t-foreach="docs" t-as="doc"> <!-- 'docs' is the list of records sent to the report -->
+                <t t-call="web.internal_layout"> <!-- This adds headers/footers -->
+                    <div class="page"> <!-- Main content page -->
+                        <h2>Property Report: <span t-field="doc.name"/></h2>
+                        <hr/>
+                        <table class="table table-bordered">
+                            <tr>
+                                <th>Address</th>
+                                <td><span t-field="doc.address"/></td>
+                            </tr>
+                            <tr>
+                                <th>Type</th>
+                                <td><span t-field="doc.property_kind"/></td>
+                            </tr>
+                            <tr>
+                                <th>Size (sq ft)</th>
+                                <td><span t-field="doc.size"/></td>
+                            </tr>
+                            <tr>
+                                <th>Monthly Rate</th>
+                                <td><span t-field="doc.monthly_rate"/></td>
+                            </tr>
+                            <tr>
+                                <th>Status</th>
+                                <td><span t-field="doc.state"/></td>
+                            </tr>
+                        </table>
+                        <h3>Description:</h3>
+                        <p t-field="doc.description"/>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>
